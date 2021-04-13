@@ -109,14 +109,14 @@ fact AddressBalances {
 
 pred init [t: Block] {
 	all a: Address, b: BalanceState {
-			getCredit[b, a, t] = VO/first
-			getDebit[b, a, t] = VO/first
+		getCredit[b, a, t] = VO/first
+		getDebit[b, a, t] = VO/first
 	}
 
 	all b: BridgeState, a: Address {
 		b.committedRoots.t = none
 		b.bondedTransfers.t [a] = none
-        b.spentTransfers.t = none
+		b.spentTransfers.t = none
 	}
 
 	all c: Chain {
@@ -155,7 +155,7 @@ fact traces {
 				(no a: Address | sendToL1[a, l2, tr, t, t'] or commitTransfers[a, l2, Chain, r, t, t']) implies l2.pendingTransfers.t' = l2.pendingTransfers.t
 				(no a: Address | L2BridgeActions[a, l2, r, t, t']) implies l2.committedRoots.t' = l2.committedRoots.t
 				(no a: Address | L1BridgeActions[a, Chain, r, t, t']) implies Chain.committedRoots.t' = Chain.committedRoots.t
-                some a, recipient: Address, t: Block-last | sendToL2[a, Chain, l2, recipient, t, t.next]
+				some a, recipient: Address, t: Block-last | sendToL2[a, Chain, l2, recipient, t, t.next]
 		}
 
 	all t: Block-last |
@@ -284,7 +284,7 @@ pred bondWithrawalL1[a: Address, l1: Chain, tr: Transfer, t, t': Block] {
 	getCredit[l1, a, t'] = getCredit[l1, a, t]
 	getDebit[l1, a, t'] = getDebit[l1, a, t].next
 	l1.bondedTransfers.t' [a] = l1.bondedTransfers.t [a] + tr
-    l1.spentTransfers.t' = l1.spentTransfers.t + tr
+	l1.spentTransfers.t' = l1.spentTransfers.t + tr
 }
 
 pred skipL1Bridge[a: Address, l1: Chain, t, t': Block] {
@@ -298,9 +298,9 @@ pred sendToL2[a: Address, l1: Chain, l2: Rollup, recipient: Address, t, t': Bloc
 }
 
 pred withdrawL1[l1: Chain, tr: Transfer, t, t': Block] {
-    tr in (l1.committedRoots.t).leaves
-    tr not in l1.spentTransfers.t
-    l1.spentTransfers.t' = l1.spentTransfers.t + tr
+	tr in (l1.committedRoots.t).leaves
+	tr not in l1.spentTransfers.t
+	l1.spentTransfers.t' = l1.spentTransfers.t + tr
 }
 
 
@@ -391,10 +391,10 @@ pred bondWithdrawalAndDistribute[a: Address, l2: Rollup, tr: Transfer, t, t': Bl
 }
 
 pred withdrawL2[l2: Rollup, tr: Transfer, t, t': Block] {
-    tr in (l2.committedRoots.t).leaves
-    tr not in l2.spentTransfers.t
+	tr in (l2.committedRoots.t).leaves
+	tr not in l2.spentTransfers.t
 	l2.spentTransfers.t' = l2.spentTransfers.t + tr
-    mintHOPL2[tr.recipient, l2, t, t']
+	mintHOPL2[tr.recipient, l2, t, t']
 }
 
 
