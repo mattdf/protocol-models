@@ -31,7 +31,7 @@ abstract sig BalanceState {
 abstract sig BridgeState extends BalanceState {
 	committedRoots: TransferRoot -> Block,
 	bondedTransfers: Address -> Transfer -> Block,
-    spentTransfers: Transfer -> Block
+	spentTransfers: Transfer -> Block
 }
 
 one sig Chain extends BridgeState {
@@ -158,11 +158,11 @@ fact traces {
                 some a, recipient: Address, t: Block-last | sendToL2[a, Chain, l2, recipient, t, t.next]
 		}
 
-    all t: Block-last |
-        let t' = t.next | all l2: Rollup | some tr: Transfer {
-                withdrawL1[Chain, tr, t, t'] or (some a: Address | bondWithrawalL1[a, Chain, tr, t, t']) or Chain.spentTransfers.t' = Chain.spentTransfers.t
-                withdrawL2[l2, tr, t, t'] or (some a: Address | bondWithrawalL2[a, l2, tr, t, t'] or bondWithdrawalAndDistribute[a, l2, tr, t, t']) or l2.spentTransfers.t' = l2.spentTransfers.t
-        }
+	all t: Block-last |
+		let t' = t.next | all l2: Rollup | some tr: Transfer {
+				withdrawL1[Chain, tr, t, t'] or (some a: Address | bondWithrawalL1[a, Chain, tr, t, t']) or Chain.spentTransfers.t' = Chain.spentTransfers.t
+				withdrawL2[l2, tr, t, t'] or (some a: Address | bondWithrawalL2[a, l2, tr, t, t'] or bondWithdrawalAndDistribute[a, l2, tr, t, t']) or l2.spentTransfers.t' = l2.spentTransfers.t
+		}
 
 }
 
@@ -202,14 +202,14 @@ pred L1BridgeActions[a: Address, l1: Chain, r: TransferRoot, t, t': Block] {
 pred L2Actions[a: Address, l2: Rollup, r: TransferRoot, tr: Transfer, t, t': Block] {
 	(L2AddressMapActions[a, l2, tr, t, t'] and L2BridgeActions[a, l2, r, t, t']) or (
 		(
-        sendToL1[a, l2, tr, t, t']
-	    or commitTransfers[a, l2, Chain, r, t, t']
-        or bondWithrawalL2[a, l2, tr, t, t']
-        ) and (
-        withdrawL2[l2, tr, t, t']
-        or bondWithdrawalAndDistribute[a, l2, tr, t, t']
-        )
-    )
+		sendToL1[a, l2, tr, t, t']
+		or commitTransfers[a, l2, Chain, r, t, t']
+		or bondWithrawalL2[a, l2, tr, t, t']
+		) and (
+		withdrawL2[l2, tr, t, t']
+		or bondWithdrawalAndDistribute[a, l2, tr, t, t']
+		)
+	)
 	//and (L2TransferActions[a, l2, tr, t, t'] or L2MessageActions[a, l2, r, t, t'] or some insolvent[l2, a, t])
 }
 
@@ -363,7 +363,7 @@ pred setTransferRoot[a: Address, l2: Rollup, r: TransferRoot, t, t': Block] {
 
 pred sendToL1[a: Address, l2: Rollup, tr: Transfer, t, t': Block] {
 	burnHOPL2[a, l2, t, t']
-    tr not in l2.spentTransfers.t
+	tr not in l2.spentTransfers.t
 	l2.pendingTransfers.t' = l2.pendingTransfers.t + tr
 }
 
@@ -385,15 +385,15 @@ pred distribute[a: Address, l2: Rollup, l1: Chain, recipient: Address, t, t': Bl
 
 
 pred bondWithdrawalAndDistribute[a: Address, l2: Rollup, tr: Transfer, t, t': Block] {
-    bondWithrawalL2[a, l2, tr, t, t']
-    l2.spentTransfers.t' = l2.spentTransfers.t + tr
+	bondWithrawalL2[a, l2, tr, t, t']
+	l2.spentTransfers.t' = l2.spentTransfers.t + tr
 	mintHOPL2[tr.recipient, l2, t, t']
 }
 
 pred withdrawL2[l2: Rollup, tr: Transfer, t, t': Block] {
     tr in (l2.committedRoots.t).leaves
     tr not in l2.spentTransfers.t
-    l2.spentTransfers.t' = l2.spentTransfers.t + tr
+	l2.spentTransfers.t' = l2.spentTransfers.t + tr
     mintHOPL2[tr.recipient, l2, t, t']
 }
 
