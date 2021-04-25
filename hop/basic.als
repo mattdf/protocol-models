@@ -10,6 +10,8 @@ sig Block {}
 
 sig Value {}
 
+sig Address {}
+
 sig Transfer {
 	recipient: one Address,
 }
@@ -18,8 +20,6 @@ sig Messenger {
 	L1Bridge: one Address,
 	L2Bridge: one Address
 }
-
-sig Address {}
 
 one sig Bonder extends Address {}
 
@@ -190,7 +190,7 @@ pred L1BonderActions[a: Address, l1: Chain, r: TransferRoot, t, t': Block] {
 }
 
 pred L1BridgeActions[a: Address, l1: Chain, r: TransferRoot, t, t': Block] {
-	confirmTransferRoot[a, Chain, r, t, t']
+	confirmTransferRoot[a, Chain, r, t, t'] and (some l2: Rollup, a2: Address | commitTransfers[a2, l2, Chain, r, t, t'])
 	or skipL1Bridge[a, Chain, t, t']
 	or a not in ((l1.rollups).messenger).L2Bridge
 }
@@ -217,14 +217,14 @@ pred L2AddressMapActions[a: Address, l2: Rollup, tr: Transfer, t, t': Block] {
 	stakeL2[a, l2, t, t']
 	or unstakeL2[a, l2, t, t']
 	or skipL2[a, l2, t, t']
-	or (mintHOPL2[a, l2, t, t'] and a = tr.recipient and tr in l2.spentTransfers.t')
+	or (mintHOPL2[a, l2, t, t'] and ((a = tr.recipient and tr in l2.spentTransfers.t') or (some a2: Address, tr2: Transfer | sendToL2[a2, Chain, l2, tr2.recipient, t, t'])))
 	//or burnHOPL2[a, l2, t, t']
 	or bondWithrawalL2[a, l2, tr, t, t']
 	//or distribute[a, l2, Chain, tr, t, t']
 }
 
 pred L2BridgeActions[a: Address, l2: Rollup, r: TransferRoot, t, t': Block] {
-	setTransferRoot[a, l2, r, t, t']
+	setTransferRoot[a, l2, r, t, t'] and (some a2: Address | confirmTransferRoot[a2, Chain, r, t, t'])
 	or a in l2.messenger.L1Bridge and l2.committedRoots.t' = l2.committedRoots.t
 	or a not in l2.messenger.L1Bridge
 }
@@ -420,6 +420,7 @@ pred show {
 	some t: Block | #Chain.committedRoots.t > 0
 	some t: Block | #Chain.spentTransfers.t > 0
 	some t: Block | #Rollup.spentTransfers.t > 0
+	all tr: Transfer | tr.recipient not in Messenger.L1Bridge + Messenger.L2Bridge + Bonder
 	some t: Block, r: Rollup | #r.pendingTransfers.t > 0 and {
 		some t': Block | t' in t.nexts and #r.pendingTransfers.t' = 0
 	}

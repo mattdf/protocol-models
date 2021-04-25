@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<alloy>
+
+<view>
+
+<projection> <type name="Block"/> </projection>
+
+<defaultnode/>
+
+<defaultedge/>
+
+<node>
+   <type name="BalanceState"/>
+   <type name="Block"/>
+   <type name="Bonder"/>
+   <type name="BridgeState"/>
+   <type name="Chain"/>
+   <type name="Int"/>
+   <type name="Messenger"/>
+   <type name="Rollup"/>
+   <type name="String"/>
+   <type name="Transfer"/>
+   <type name="TransferRoot"/>
+   <type name="univ"/>
+   <type name="seq/Int"/>
+   <type name="TO/Ord"/>
+   <type name="VO/Ord"/>
+   <set name="$show_a" type="Address"/>
+   <set name="$show_b" type="Bonder"/>
+   <set name="$show_b&apos;" type="Bonder"/>
+   <set name="$show_b&apos;&apos;" type="Bonder"/>
+   <set name="$show_r" type="Rollup"/>
+   <set name="$show_t" type="Transfer"/>
+   <set name="$show_t&apos;" type="Block"/>
+   <set name="$show_t&apos;&apos;" type="Block"/>
+   <set name="$show_t&apos;&apos;&apos;" type="Block"/>
+   <set name="$show_t&apos;&apos;&apos;&apos;" type="Block"/>
+   <set name="$show_t&apos;&apos;&apos;&apos;&apos;" type="Block"/>
+   <set name="First" type="TO/Ord"/>
+   <set name="Next" type="TO/Ord"/>
+</node>
+
+<node visible="no" label="">
+   <type name="Value"/>
+</node>
+
+<node visible="no" label="A">
+   <type name="Address"/>
+</node>
+
+<edge attribute="no">
+   <relation name="bondedTransfers"> <type name="BalanceState"/> <type name="Address"/> <type name="Transfer"/> </relation>
+</edge>
+
+<edge attribute="yes">
+   <relation name="credit"> <type name="BalanceState"/> <type name="Address"/> <type name="Value"/> </relation>
+   <relation name="debit"> <type name="BalanceState"/> <type name="Address"/> <type name="Value"/> </relation>
+   <relation name="HBalance"> <type name="Rollup"/> <type name="Address"/> <type name="Value"/> </relation>
+   <relation name="L1Bridge"> <type name="Messenger"/> <type name="Address"/> </relation>
+   <relation name="L2Bridge"> <type name="Messenger"/> <type name="Address"/> </relation>
+   <relation name="recipient"> <type name="Transfer"/> <type name="Address"/> </relation>
+</edge>
+
+<edge constraint="no">
+   <relation name="leaves"> <type name="TransferRoot"/> <type name="Transfer"/> </relation>
+</edge>
+
+</view>
+
+</alloy>
